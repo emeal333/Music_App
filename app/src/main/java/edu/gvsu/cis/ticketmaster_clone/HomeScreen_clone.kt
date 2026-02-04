@@ -2,11 +2,14 @@ package edu.gvsu.cis.ticketmaster_clone
 
 import android.R.attr.onClick
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,7 +35,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
@@ -40,8 +42,13 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.shape.RoundedCornerShape // Add this import
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,7 +136,7 @@ fun HomeScreen() {
                         .padding(horizontal = 10.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    val categories = listOf("Concerts", "Sports", "Arts, Theater & Comedy")
+                    val categories = listOf("Concerts", "Sports", "Arts & Theater")
                     categories.forEach { category ->
                         OutlinedButton(
                             shape = RoundedCornerShape(5.dp),
@@ -144,6 +151,51 @@ fun HomeScreen() {
             }
         }
     ) { innerPadding ->
-        // stuff
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.newton1),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+
+                Text(
+                    text = "Elizabeth's Cat",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.align(Alignment.BottomStart).padding(40.dp)
+
+
+                )
+
+                Button(
+                    onClick = {},
+                    modifier = Modifier.align(Alignment.BottomStart),
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Text("Find Tickets")
+                }
+            }
+
+            Box(
+                modifier = Modifier.fillMaxWidth().height(350.dp)
+            ) {
+                Image(painter = painterResource(id = R.drawable.newton2),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    ,)
+
+            }
+        }
     }
 }
