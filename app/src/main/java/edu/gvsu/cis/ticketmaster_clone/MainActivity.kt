@@ -44,10 +44,18 @@ fun AppNavigation() {
             )
         }
         composable(Screen.NoteDetection.route) {
-            NoteDetectionScreen()
+            NoteDetectionScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
         composable(Screen.GuitarTuner.route) {
-            GuitarTunerScreen()
+            GuitarTunerScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
