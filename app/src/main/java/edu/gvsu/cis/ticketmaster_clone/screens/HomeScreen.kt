@@ -1,11 +1,14 @@
 package edu.gvsu.cis.ticketmaster_clone.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -23,11 +26,13 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import edu.gvsu.cis.ticketmaster_clone.R
 import edu.gvsu.cis.ticketmaster_clone.ui.theme.TicketMaster_CloneTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToNoteDetection: () -> Unit,
@@ -36,9 +41,6 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             HomeTopBar()
-        },
-        bottomBar = {
-            HomeBottomButtons(onNavigateToNoteDetection, onNavigateToGuitarTuner)
         },
         containerColor = Color.Transparent
     ) { innerPadding ->
@@ -50,18 +52,42 @@ fun HomeScreen(
                 contentScale = ContentScale.Crop
             )
             
+            // Welcome message at the top
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
                     .padding(16.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.TopCenter
             ) {
-                Text(
-                    text = "Welcome to Music Learning",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = Color.Black.copy(alpha = 0.4f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Welcome to the Music Learning App",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            // Buttons positioned towards the bottom with custom Y placement
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(bottom = 80.dp), // Adjust this value to move buttons up or down
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                HomeBottomButtons(onNavigateToNoteDetection, onNavigateToGuitarTuner)
             }
         }
     }
@@ -89,35 +115,18 @@ fun HomeBottomButtons(
     onNavigateToNoteDetection: () -> Unit,
     onNavigateToGuitarTuner: () -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(9.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
             onClick = onNavigateToNoteDetection,
             modifier = Modifier
-                .weight(1f)
-                .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp)),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFEEEAC2),
-                contentColor = Color(0xFF1F1A02)
-            ),
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 0.dp, // Using shadow modifier for better visual control
-                pressedElevation = 2.dp
-            )
-        ) {
-            Text("Note Detection")
-        }
-        
-        Button(
-            onClick = onNavigateToGuitarTuner,
-            modifier = Modifier
-                .weight(1f)
+                .fillMaxWidth(0.9f)
+                .height(64.dp)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp)),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
@@ -129,7 +138,32 @@ fun HomeBottomButtons(
                 pressedElevation = 2.dp
             )
         ) {
-            Text("Guitar Tuning")
+            Text(
+                "Note Detection",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+        
+        Button(
+            onClick = onNavigateToGuitarTuner,
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .height(64.dp)
+                .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp)),
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFEEEAC2),
+                contentColor = Color(0xFF1F1A02)
+            ),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 2.dp
+            )
+        ) {
+            Text(
+                "Guitar Tuning",
+                style = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }
