@@ -29,6 +29,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,12 +44,36 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import edu.gvsu.cis.ticketmaster_clone.R
 import edu.gvsu.cis.ticketmaster_clone.ui.theme.TicketMaster_CloneTheme
+import edu.gvsu.cis.ticketmaster_clone.viewmodel.NoteDetectorViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun GuitarTunerScreen(onNavigateBack: () -> Unit) {
+fun GuitarTunerScreen(
+    onNavigateBack: () -> Unit,
+    vm: NoteDetectorViewModel = viewModel()
+) {
+    val micPermission = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
+    val isRecording by vm.isRecording.collectAsState()
+    val noteResult by vm.noteResult.collectAsState()
+
+    var activeNote by remember { mutableStateOf<String?>(null) }
+
+    val targetFrequencies = mapOf(
+        "E" to 82.41f,
+        "A" to 110.00f,
+        "D" to 146.83f,
+        "G" to 196.00f,
+        "B" to 246.94f,
+        "e" to 329.63f
+    )
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -86,7 +115,6 @@ fun GuitarTunerScreen(onNavigateBack: () -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Header section with "Guitar Tuner" title
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -104,24 +132,40 @@ fun GuitarTunerScreen(onNavigateBack: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // White Circle Button Placeholder (Slightly Larger)
                 Box(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable { /* Action here */ },
+                        .background(if (isRecording) Color(0xFFE3F2FD) else Color.White)
+                        .clickable {
+                            if (!micPermission.status.isGranted) {
+                                micPermission.launchPermissionRequest()
+                            } else if (isRecording) {
+                                vm.stopRecording()
+                                activeNote = null
+                            } else {
+                                vm.startRecording()
+                            }
+                        },
                     contentAlignment = Alignment.Center
                 ) {
-                    // Placeholder for future image
-                    Image(
-                        painter = painterResource(id = R.drawable.microphone3),
-                        contentDescription = null,
-                    )
+                    if (isRecording && noteResult.isDetected) {
+                        Text(
+                            text = noteResult.note,
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.microphone3),
+                            contentDescription = "Microphone",
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
                 }
 
                 val strings = listOf("E", "A", "D", "G", "B", "e")
-                // Buttons closer together using Arrangement.spacedBy
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -130,33 +174,58 @@ fun GuitarTunerScreen(onNavigateBack: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     strings.forEach { note ->
+                        val isActive = activeNote == note && isRecording
+                        val targetFreq = targetFrequencies[note] ?: 0f
+
+                        val buttonText = if (isActive) {
+                            when {
+                                !noteResult.isDetected -> "Listening..."
+                                noteResult.frequency < targetFreq - 2f -> "Higher"
+                                noteResult.frequency > targetFreq + 2f -> "Lower"
+                                else -> "Successfully tuned"
+                            }
+                        } else {
+                            "Record for: $note"
+                        }
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(64.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Button taking up 2/3 of the width
                             Button(
-                                onClick = { /* Play note or start tuning */ },
+                                onClick = {
+                                    if (!micPermission.status.isGranted) {
+                                        micPermission.launchPermissionRequest()
+                                    } else {
+                                        if (activeNote == note) {
+                                            vm.stopRecording()
+                                            activeNote = null
+                                        } else {
+                                            vm.stopRecording()
+                                            vm.startRecording()
+                                            activeNote = note
+                                        }
+                                    }
+                                },
                                 modifier = Modifier
                                     .weight(2f)
                                     .padding(start = 10.dp, end = 8.dp)
                                     .shadow(elevation = 4.dp, shape = RoundedCornerShape(10.dp)),
                                 shape = RoundedCornerShape(10.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFEEEAC2),
-                                    contentColor = Color(0xFF1F1A02)
+                                    containerColor = if (isActive) Color(0xFF43A047) else Color(0xFFEEEAC2),
+                                    contentColor = if (isActive) Color.White else Color(0xFF1F1A02)
                                 )
                             ) {
                                 Text(
-                                    text = "Record for: $note",
+                                    text = buttonText,
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
 
-                            // Image Placeholder hugging the right side (1/3 width)
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
@@ -167,8 +236,7 @@ fun GuitarTunerScreen(onNavigateBack: () -> Unit) {
                                     painter = painterResource(id = R.drawable.tuning_peg),
                                     contentDescription = null,
                                 )
-                                
-                                // Text on top of the image placeholder
+
                                 Text(
                                     text = "$note",
                                     color = Color.Black,

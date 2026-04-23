@@ -248,13 +248,13 @@ fun NoteDetectionScreen(
                             Text(text = if (isMetronomeOn) "⏹ Stop Metronome" else "▶ Start Metronome")
                         }
 
-                        if (!isMetronomeOn) {
-                            Text(
-                                text = "Requires res/raw/metronome.mp3",
-                                fontSize = 11.sp,
-                                color = Color.Gray
-                            )
-                        }
+                        //if (!isMetronomeOn) {
+                            //Text(
+                                //text = "Requires res/raw/metronome.mp3",
+                               // fontSize = 11.sp,
+                                //color = Color.Gray
+                            //)
+                        //}
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 24.dp))
 

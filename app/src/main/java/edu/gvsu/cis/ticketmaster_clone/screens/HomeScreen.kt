@@ -52,7 +52,6 @@ fun HomeScreen(
                 contentScale = ContentScale.Crop
             )
             
-            // Welcome message at the top
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -79,12 +78,11 @@ fun HomeScreen(
                 }
             }
 
-            // Buttons positioned towards the bottom with custom Y placement
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(bottom = 80.dp), // Adjust this value to move buttons up or down
+                    .padding(bottom = 80.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 HomeBottomButtons(onNavigateToNoteDetection, onNavigateToGuitarTuner)
